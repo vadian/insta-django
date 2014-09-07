@@ -1,0 +1,31 @@
+upstream <%= @site[:name] %> {
+  ip_hash;
+  server unix:///tmp/<%= @site[:name] %>.sock;
+}
+
+server {
+ 
+  listen 80;
+  server_name <%= @site[:aliases] %>;
+  root <%= node[:webroot] %>/<%= @site[:name] %>/;
+  access_log <%= node[:webroot] %>/log/nginx-access.log;
+  error_log <%= node[:webroot] %>/log/nginx-error.log;
+ 
+  location /media/ {
+    alias <%= node[:webroot] %>/media/<%= @site[:name] %>/;
+  }
+  location /static/ {
+    alias <%= node[:webroot] %>/<%= @site[:name] %>/static/;
+  }
+ 
+  location / {
+    include uwsgi_params;
+    uwsgi_pass <%= @site[:name] %>;
+
+    proxy_redirect     off;
+    proxy_set_header   Host $host;
+    proxy_set_header   X-Real-IP $remote_addr;
+    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Forwarded-Host $server_name;
+  }
+}

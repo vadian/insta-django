@@ -1,0 +1,12 @@
+<uwsgi>
+<socket>/tmp/<%= @site[:name] %>.sock</socket>
+<processes>2</processes>
+<master/>
+<post-buffering>4096</post-buffering>
+<harakiri>20</harakiri>
+<chdir><%= node[:webroot] %>/<%= @site[:name] %>/<%= @site[:workdir] %></chdir>
+<force-cwd><%= node[:webroot] %>/<%= @site[:name] %>/</force-cwd>
+<env><%= node[:webroot] %>/envs/<%= @site[:name] %>/</env>
+<wsgi-file><%= node[:webroot] %>/<%= @site[:name] %>/<%= @site[:wsgi_file] %></wsgi-file>
+<pythonpath>..</pythonpath>
+</uwsgi>

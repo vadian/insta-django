@@ -1,0 +1,96 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+# Follow README instructions to create your vagrant.rb file
+require File.dirname(__FILE__) + '/vagrant.rb'
+include MyVars
+
+require File.dirname(__FILE__) + '/../siteinfo.rb'
+include Localdata
+
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+
+#DEV VM SETUP
+#
+  if Role == "dev"
+    config.vm.box = "chef/debian-7.6"
+
+    config.hostmanager.enabled = true
+    config.hostmanager.manage_host = true
+    config.hostmanager.ignore_private_ip = false
+    config.hostmanager.include_offline = true
+
+  #Set hostname to enable multiple instances
+    config.vm.define "dev-"+ Base_sitename do |caffeinate|
+      caffeinate.vm.hostname = Base_sitename + ".dev"
+      caffeinate.vm.network :private_network, ip: '192.168.42.42'
+      caffeinate.hostmanager.aliases = Dev_aliases
+    end
+
+#PROD DIGITALOCEAN SETUP
+    else
+      config.vm.box = "dummy"
+
+    #Set hostname to enable multiple instances
+    if Role == "prod"
+      config.vm.define "#{:Base_sitename}" do |caffeinate|
+        caffeinate.vm.hostname = Base_sitename
+      end
+    elsif Role == "test"
+      config.hostmanager.enabled = true
+      config.hostmanager.manage_host = true
+      config.hostmanager.ignore_private_ip = false
+      config.hostmanager.include_offline = true
+  
+      config.vm.define "#{:Base_sitename}-test" do |caffeinate_test|
+        caffeinate_test.vm.hostname = "#{:Base_sitename}-test"
+        caffeinate_test.vm.network :public_network
+        caffeinate_test.hostmanager.aliases = Serveraliases
+      end
+    end
+
+
+    config.vm.provider :digital_ocean do |provider, override|
+      provider.box = "digital_ocean"
+      provider.image = "Debian 7.0 x64"
+      provider.region = "nyc2"
+      provider.size = "512mb"
+      provider.token = Token
+      provider.ssh_key_name = "Vagrant"
+      override.vm.box = "digital_ocean"
+      override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+      #override.vm.hostname = "caffeinate"
+      override.ssh.private_key_path = Rsa_keypath
+    end
+  end
+  config.omnibus.chef_version = :latest
+
+  Sites.each do |site|
+    if Role == "dev"
+      if Local_Rsync == true
+        config.vm.synced_folder "#{Localroot}/#{site}", "#{Webroot}/#{site}/", type: "rsync"
+      else
+        config.vm.synced_folder "#{Localroot}/#{site}", "#{Webroot}/#{site}/"
+      end   
+    else
+      config.vm.synced_folder "#{Localroot}/#{site}/", "#{Webroot}/#{site}/",type: "rsync", rsync__exclude: [".git/", "**/.DS_Store"], rsync__args: "-l" #rsync__args: ["--exclude '.git'", "--exclude 'static'", "--exclude 'local_settings.py'", "--exclude 'vagrant.rb'"]
+    end
+  end
+
+
+   config.vm.provision "chef_solo" do |chef|
+     chef.cookbooks_path = "../chef/cookbooks"
+     chef.roles_path = "../chef/roles"
+     chef.data_bags_path = "../chef/data_bags"
+     chef.add_recipe "recipe[caffeinate]"
+     chef.add_recipe "recipe[caffeinate::python]"
+     chef.add_recipe "recipe[caffeinate::memcached]"
+     chef.add_recipe "recipe[caffeinate::nginx]"
+#     chef.add_recipe "recipe[caffeinate::gitlist]"
+
+     chef.json = Jsondata
+   end
+end
