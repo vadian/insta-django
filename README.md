@@ -1,5 +1,5 @@
 insta-django
-
+-
 Vagrant deployment with Chef provisioner to quickly create a working nginx/supervisor/django server. Manages both development VM and production deployment. Easily migrate existing code or create new projects. Supports any wsgi project.
 
 Quickstart Instructions
