@@ -15,37 +15,39 @@ cd into 'dev' directory
 
 Edit vagrant.rb as below:
 
-module MyVars
-	Role = "dev"
-	Ssh_key = "ssh-rsa AJFADKNFWOHIFWOI89724DNKJDWANKJDAWNKDAWDAKLDWetcetcetc name@host"
-end
+	module MyVars
+		Role = "dev"
+		Ssh_key = "ssh-rsa AJFADKNFWOHIFWOI89724DNKJDWANKJDAWNKDAWDAKLDWetcetcetc name@host"
+	end
 
 Note that you can add additional keys here that you intend to use for users (as you will see in the next step). The private versions of these keys should exist in your appropriate directory for your computer, usually '~/.ssh'
 
-    Edit the siteinfo.rb in a text editor. Many of the default options here will work, but you should configure the specifics of your site. Instructions are included in the file.
+Copy siteinfo-example.rb to siteinfo-rb.
 
-    'vagrant up' in 'dev' directory.
+Edit the siteinfo.rb in a text editor. Many of the default options here will work, but you should configure the specifics of your site. Instructions are included in the file.
 
-    'vagrant ssh' to connect to your server, and configure your databases.
+'vagrant up' in 'dev' directory.
+
+'vagrant ssh' to connect to your server, and configure your databases.
 
 Production Server:
 --------------------------------------------
 
-    CD into 'prod' directory
+CD into 'prod' directory
 
-    Edit vagrant.rb as below:
+Edit vagrant.rb as below:
 
-module MyVars
-	Role = "prod"
-	Token = "DigitalOcean OAuth Token"
-	Ssh_key = "ssh-rsa AJFADKNFWOHIFWOI89724DNKJDWANKJDAWNKDAWDAKLDWetcetcetc name@host"
-end
+	module MyVars
+		Role = "prod"
+		Token = "DigitalOcean OAuth Token"
+		Ssh_key = "ssh-rsa AJFADKNFWOHIFWOI89724DNKJDWANKJDAWNKDAWDAKLDWetcetcetc name@host"
+	end
 
-    None of the information in 'siteinfo.rb' is particular to dev or prod sites. Your current config you tested on dev should work in prod.
+None of the information in 'siteinfo.rb' is particular to dev or prod sites. Your current config you tested on dev should work in prod.
 
-    'vagrant up' in 'dev' directory.
+'vagrant up' in 'dev' directory.
 
-    'vagrant ssh' to connect to your droplet and configure your databases.
+'vagrant ssh' to connect to your droplet and configure your databases.
 
 Usage:
 --------------------------------------------
@@ -60,18 +62,33 @@ Deploying a new django site:
 --------------------------------------------
 
 Set 'Local_Rsync = true' in siteinfo.rb.
+
 Create a new directory in your local webroot, and add it to the Sites = [] array in siteinfo.rb.
+
 Configure your site by adding appropriate information to the JSON data.
+
 In dev/ directory, 'vagrant up'. 
+
 'ssh web_user@web_alias'
+
 'source /envs/sitename/bin/activate'
+
 'cd webroot'
+
 'rm sitename'
+
 'django-admin startproject sitename'
+
 'logout'
+
 NOTE: THIS WILL DESTRUCTIVELY OVERWRITE ANY CHANGED FILES IN YOUR SYNCED SITES!
+
 'vagrant rsync-back' (requires vagrant plugin rsync-back')
+
 Set 'Local_Rsync = false'
+
 'vagrant reload'
 
-You should now have a working Django site, which automatically reflects changes on local disk. Start working on your site's configuration and enjoy!
+
+You should now have a working Django dev site, which automatically reflects changes on local disk. Start working on your site's configuration and enjoy!
+-------------------------------------------
