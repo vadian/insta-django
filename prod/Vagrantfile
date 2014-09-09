@@ -36,7 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     #Set hostname to enable multiple instances
     if Role == "prod"
-      config.vm.define "#{:Base_sitename}" do |caffeinate|
+      config.vm.define Base_sitename do |caffeinate|
         caffeinate.vm.hostname = Base_sitename
       end
     elsif Role == "test"
