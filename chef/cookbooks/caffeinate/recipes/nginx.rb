@@ -2,12 +2,12 @@ package "nginx" do
     :upgrade
 end
 
-service "lighttpd" do
-  enabled false
-  running false
-  supports :status => true, :restart => true, :reload => true
-  action [:stop, :disable]
-end
+#service "lighttpd" do
+#  enabled false
+#  running false
+#  supports :status => true, :restart => true, :reload => true
+#  action [:stop, :disable]
+#end
 
 service "nginx" do
   enabled true
