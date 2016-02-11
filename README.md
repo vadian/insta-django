@@ -48,7 +48,7 @@ Edit vagrant.rb as below:
 
 None of the information in 'siteinfo.rb' is particular to dev or prod sites. Your current config you tested on dev should work in prod.
 
-'vagrant up' in 'dev' directory.
+'vagrant up' in 'prod' directory.
 
 'vagrant ssh' to connect to your droplet and configure your databases.
 
